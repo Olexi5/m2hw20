@@ -1,29 +1,35 @@
 const list = document.querySelector(".gallery");
 const form = document.querySelector(".search-form");
-const btn = document.querySelector(".load")
+const btn = document.querySelector(".load");
 const API_KEY = "58179698-c57230acc5665af1e79bc00f7";
 const BASE_URL = "https://pixabay.com/api/";
 let page = 1;
-let query = ""
-
-function getImg() {
-  const params = new URLSearchParams({
-    page: page,
-    image_type: "photo",
-    orientation: "horizontal",
-    per_page: 12,
-    key: API_KEY,
-    q: query,
-  });
-  fetch(`${BASE_URL}?${params}`).then(d=>d.json()).then(data=>{
-    const hasArticles = data.totalHits > page * 12;
-    btn.hidden = !hasArticles;
-    list.innerHTML += renderImg(data.hits)
-})
+let query = "";
+async function getImg() {
+  try{
+    const params = new URLSearchParams({
+      page: page,
+      image_type: "photo",
+      orientation: "horizontal",
+      per_page: 12,
+      key: API_KEY,
+      q: query,
+    });
+    fetch(`${BASE_URL}?${params}`)
+      .then((d) => d.json())
+      .then((data) => {
+        const hasArticles = data.totalHits > page * 12;
+        btn.hidden = !hasArticles;
+        list.innerHTML += renderImg(data.hits);
+      });
+  }catch(e){
+    alert(e)
+  }
 }
-function renderImg(data){
-    return data.map(
-      (img) => `
+function renderImg(data) {
+    return data
+      .map(
+        (img) => `
     <div class="photo-card">
       <img src="${img.webformatURL}" alt="" />
       <div class="stats">
@@ -53,15 +59,23 @@ function renderImg(data){
       </div>
     </div>    
     `,
-    ).join(" ")
+      ).join("")
 }
-form.addEventListener("input", (e) => {
-    list.innerHTML=""
-  e.preventDefault();
-  query = form.elements['query'].value
-  getImg()
+form.addEventListener("input", async (e) => {
+    try{
+        list.innerHTML = "";
+        e.preventDefault();
+        query = form.elements["query"].value;
+        getImg();
+    }catch(e){
+        alert(e)
+    }
 });
-btn.addEventListener("click", ()=>{
-    page++
-    getImg()
-})
+btn.addEventListener("click", async() => {
+    try{
+        page++;
+        getImg();
+    }catch(e){
+        alert(e)
+    }
+});
